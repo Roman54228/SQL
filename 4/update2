@@ -1,0 +1,16 @@
+
+/*В турнирах для шахматистов выше 7го ранга и проходящих в центральном и южном регионах увеличить призовой фонд на 1000  */
+update tournament
+set prize_pool = prize_pool + 1000
+where prize_pool IN
+(
+   select prize_pool from tournament
+join shahmatist
+on(tournament.qual_id=shahmatist.qual_id)
+join [location]
+on(tournament.location_id=[location].location_id)
+join Region
+on([location].region_id=Region.region_id)
+where shahmatist.qual_id > 7 and [location].region_id = 2
+or [location].region_id = 3
+)

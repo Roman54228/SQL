@@ -1,0 +1,9 @@
+select list_price from dbo.PRICE
+join dbo.ITEM
+
+on(dbo.PRICE.product_id=dbo.ITEM.product_id)
+join dbo.SALES_ORDER
+on(dbo.SALES_ORDER.order_id=dbo.ITEM.order_id)
+join dbo.CUSTOMER
+on(dbo.CUSTOMER.customer_id=dbo.SALES_ORDER.customer_id)
+where name = 'WOMENS SPORTS';

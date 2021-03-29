@@ -1,0 +1,4 @@
+SELECT top(1) name, (salary + ISNULL(commission,0)) as sum FROM dbo.DEPARTMENT 
+JOIN dbo.EMPLOYEE
+ON(dbo.DEPARTMENT.department_id=dbo.EMPLOYEE.department_id)
+ORDER BY sum ASC;

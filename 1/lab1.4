@@ -1,0 +1,7 @@
+select manager_id, (cast (sum(salary) as float )/ cast (count(employee_id) as float)) as ce from dbo.EMPLOYEE
+join dbo.JOB
+on(dbo.EMPLOYEE.job_id=dbo.JOB.job_id)
+where [function] = 'MANAGER'
+group by manager_id
+
+;

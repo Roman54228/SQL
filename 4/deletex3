@@ -1,0 +1,33 @@
+/*Удалить шахматистов, понизивших рейтинг на тунире 'World Chess Olympiad'      */
+
+delete from shahmatist
+where shahmatist.shahmatist_id in
+(
+select shahmatist.shahmatist_id from shahmatist
+join participation
+on(shahmatist.shahmatist_id=participation.shahmatist_id)
+join tournament
+on(participation.tourn_id=tournament.tourn_id)
+where rating_change < 0 and tourn_name = 'World Chess Olympiad' 
+)
+
+/* Удалить шахматистов, родившихся до 2000 года и Имеющих рейтинг ниже 1800 */
+delete from shahmatist
+where shahmatist.shahmatist_id in
+(
+    select shahmatist_id from shahmatist
+    where year(birth_date) <= 2000 AND rating < 1800 
+)
+
+
+
+/*удалить клуб в котором меньше всего участников     */
+delete from club_info
+where club_info.club_id IN
+(
+ select top(1) club_info.club_id from club_info
+    join club
+    on(club_info.club_id=club.club_id)
+    group by club_info.club_id 
+   order by count(shahmatist_id) asc
+)

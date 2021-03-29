@@ -1,0 +1,640 @@
+use laba3
+DROP TABLE IF EXISTS [Region]
+DROP TABLE IF EXISTS [access]
+DROP TABLE IF EXISTS [matches_moves]
+DROP TABLE IF EXISTS [club]
+DROP TABLE IF EXISTS [club_info]
+DROP TABLE IF EXISTS [matches]
+DROP TABLE IF EXISTS [participation]
+DROP TABLE IF EXISTS [shahmatist]
+DROP TABLE IF EXISTS [tournament]
+DROP TABLE IF EXISTS [location]
+DROP TABLE IF EXISTS [qual]
+Create table[access](
+    shahmatist_id int NOT NULL,
+	email varchar(30) NOT NULL,
+	hash_password varchar(100) NOT NULL,
+    constraint PK_access primary key(email))
+    GO
+create table [club] (
+    [shahmatist_id] [int] NOT NULL,
+	[club_id] [int] NOT NULL,
+    constraint PK_club primary key(shahmatist_id,club_id))
+    GO
+create table [club_info](
+    [club_id] [int] IDENTITY(1,1) NOT NULL,
+	[club_name] [varchar](50) NOT NULL,
+	[location_id] [int] NOT NULL,
+    constraint PK_club_info primary key(club_id))
+GO
+create table [location](
+[location_id] [int] IDENTITY(1,1) NOT NULL,
+	[region_id] [int] NOT NULL,
+	[adress] [varchar](60) NOT NULL,
+    constraint PK_location primary key (location_id))
+GO
+create table [matches_moves](
+    [match_id] [int] NOT NULL,
+	[tourn_id] [int] NOT NULL,
+    constraint PK_matches_moves primary key(match_id,tourn_id))
+GO
+create table [matches](
+    [match_id] [int] IDENTITY(1,1) NOT NULL,
+	[player_white] [int] NULL,
+	[player_black] [int] NULL,
+	[white_score] [float] NOT NULL,
+	[game_mode] [varchar](10) NOT NULL,
+	[tim] [time](7) NOT NULL,
+	[moves] [text] NULL,
+    constraint PK_matches primary key(match_id))
+    go
+create table [participation](
+    [shahmatist_id] [int] NOT NULL,
+	[tourn_id] [int] NOT NULL,
+	[place] [int] NULL default 0,
+	[participant_id] [int] IDENTITY(1,1) NOT NULL,
+	[rating_change] [int] NULL,
+    constraint PK_participation primary key(participant_id))
+go
+create table [qual](
+    [qual_name] [varchar](30) NOT NULL,
+	[qual_id] [int] IDENTITY(1,1) NOT NULL,
+	[min_rating_man] [int] NULL,
+	[min_rating_women] [int] NULL,
+    constraint PK_qual primary key(qual_id))
+
+go
+create table [Region](
+    [region_name] [varchar](15) NOT NULL,
+	[region_id] [int] IDENTITY(1,1) NOT NULL,
+    constraint PK_Region primary key (region_id))
+go
+create table [shahmatist](
+    [rating] [int] NOT NULL,
+	[qual_id] [int] NOT NULL,
+	[shahmatist_id] [int] IDENTITY(1,1) NOT NULL,
+	[sex] [varchar](8) NULL,
+	[motherland] [varchar](12) NULL,
+	[birth_date] [date] NOT NULL,
+	[name] [varchar](25) NULL,
+    constraint PK_shahmatist primary key(shahmatist_id))
+go
+create table [tournament](
+    [tourn_id] [int] IDENTITY(1,1) NOT NULL,
+	[tourn_name] [varchar](50) NULL,
+	[qual_id] [int] NOT NULL,
+	[start_date] [date] NULL,
+	[end_date] [date] NULL,
+	[location_id] [int] NOT NULL,
+	[prize_pool] [int] NULL,
+    constraint PK_tournament primary key (tourn_id))
+GO
+ALTER TABLE [access] 
+ADD CONSTRAINT [access_fk0] 
+FOREIGN KEY ([shahmatist_id]) 
+REFERENCES [shahmatist]([shahmatist_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+GO
+ALTER TABLE [club] 
+ADD CONSTRAINT [club_fk0] 
+FOREIGN KEY ([shahmatist_id]) 
+REFERENCES [shahmatist]([shahmatist_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+GO
+ALTER TABLE [club] 
+ADD CONSTRAINT [club_fk1] 
+FOREIGN KEY ([club_id]) 
+REFERENCES [club_info]([club_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE
+GO
+ALTER TABLE [club_info] 
+ADD CONSTRAINT [club_info_fk0] 
+FOREIGN KEY ([location_id]) 
+REFERENCES [location]([location_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE  
+go
+ALTER TABLE [matches_moves] 
+ADD CONSTRAINT [matches_moves_fk0] 
+FOREIGN KEY ([tourn_id]) 
+REFERENCES [tournament]([tourn_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+GO
+ALTER TABLE [matches_moves] 
+ADD CONSTRAINT [matches_moves_fk1] 
+FOREIGN KEY ([match_id]) 
+REFERENCES [matches]([match_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+GO
+ALTER TABLE [matches] 
+ADD CONSTRAINT [matches_fk0] 
+FOREIGN KEY ([player_white]) 
+REFERENCES [participation]([participant_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+go
+
+ALTER TABLE [participation] 
+ADD CONSTRAINT [participation_fk0] 
+FOREIGN KEY ([shahmatist_id]) 
+REFERENCES [shahmatist]([shahmatist_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+GO
+ALTER TABLE [participation] 
+ADD CONSTRAINT [participation_fk1] 
+FOREIGN KEY ([tourn_id]) 
+REFERENCES [tournament]([tourn_id]) 
+ON DELETE NO ACTION 
+ON UPDATE NO ACTION
+GO
+ALTER TABLE [shahmatist] 
+ADD CONSTRAINT [shahmatist_fk0] 
+FOREIGN KEY ([qual_id]) 
+REFERENCES [qual]([qual_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+GO
+ALTER TABLE [tournament] 
+ADD CONSTRAINT [tournament_fk0] 
+FOREIGN KEY ([qual_id]) 
+REFERENCES [qual]([qual_id]) 
+ON DELETE NO ACTION 
+ON UPDATE NO ACTION 
+GO
+ALTER TABLE [tournament] 
+ADD CONSTRAINT [tournament_fk1] 
+FOREIGN KEY ([location_id]) 
+REFERENCES [location]([location_id]) 
+ON DELETE CASCADE 
+ON UPDATE CASCADE 
+
+
+--Region
+insert into Region values 	 ('Ural')
+insert into Region values 	 ('Central')
+insert into Region values 	 ('South')
+insert into Region values 	 ('Kavkaz')
+insert into Region values 	 ('Privolzhskiy')
+insert into Region values 	 ('Sibir')
+insert into Region values 	 ('East')
+insert into Region values 	 ('North')
+--qual
+insert into qual values	 ('newbie',	NULL,NULL)
+insert into qual values	 ('4th rank',1000,1000)
+insert into qual values	 ('3rd rank',1400,1400)
+insert into qual values	 ('2nd rank',1600,1600)
+insert into qual values	 ('1st rank',1800,1800)
+insert into qual values	 ('candidate for master',2000,2000)
+insert into qual values	 ('nat_master among women',NULL,2000)
+insert into qual values	 ('nat_master',2200,2200)
+insert into qual values	 ('int_master among women',NULL,2200)
+insert into qual values	 ('int_master',2400,NULL)
+insert into qual values	 ('int_grandmaster among women',NULL,2400)
+insert into qual values	 ('int_grandmaster',2500,NULL)
+insert into qual values	 ('womens world champion',NULL,2500)
+insert into qual values	 ('pretendant for the world champ',2750,2750)
+--shahmatist
+insert into dbo.shahmatist values	 (1557,3,'female','Russia','1996-04-16','Kate Golovina')
+insert into dbo.shahmatist values	 (2017,7,'female','Poland','1981-10-21','Liza Erohina')
+insert into dbo.shahmatist values	 (1048,2,'female','Russia','1983-05-17','Anna Kotova')
+insert into dbo.shahmatist values	 (2207,8,'male','Russia','1983-08-05','Oleg Rotov')
+insert into dbo.shahmatist values	 (681,1,'male','Russia','1984-02-02','Roma Romin')
+insert into dbo.shahmatist values	 (1488,3,'female','Russia','1985-06-04','Janna ptichkina')
+insert into dbo.shahmatist values	 (2053,6,'male','Belarus','1986-05-30','Kirill Sonin')
+insert into dbo.shahmatist values	 (63,1,'female','Russia','1987-04-02','Margo Ivanova')
+insert into dbo.shahmatist values	 (321,1,'female','Latvia','1989-12-29','Anna Heizenberg')
+insert into dbo.shahmatist values	 (368,1,'female','Russia','1992-06-05','Elena Letuchaya')
+insert into dbo.shahmatist values	 (195,1,'female','Russia','1993-10-21','Tamara Mozheiko')
+insert into dbo.shahmatist values	 (234,1,'male','Russia','1993-11-26','Anton Capozhkin')
+insert into dbo.shahmatist values	 (572,1,'male','Russia','1994-07-04','Zhenya Ziziko')
+insert into dbo.shahmatist values	 (276,1,'male','Russia','1995-03-16','Renat Renatov')
+insert into dbo.shahmatist values	 (547,1,'male','Russia','1995-04-12','Petya Evdokimov')
+insert into dbo.shahmatist values	 (627,1,'male','Russia','1997-01-17','Petya Brazovskiy')
+insert into dbo.shahmatist values	 (1128,2,'male','Russia','1999-07-12','Dima Melnik')
+insert into dbo.shahmatist values	 (1826,5,'male','Russia','1999-09-14','Danila Svinov')
+insert into dbo.shahmatist values	 (2674,12,'female','Belarus','2002-06-24','Masha Sobakina')
+insert into dbo.shahmatist values	 (176,2,'male','Russia','2005-09-15','Zhenya Basalay')
+insert into dbo.shahmatist values	 (939,1,'female','Russia','2006-11-21','Liza Birzhakova')
+insert into dbo.shahmatist values	 (1181,2,'female','Belarus','2007-03-19','Katya Ivanova')
+insert into dbo.shahmatist values	 (754,2,'female','Russia','2008-12-18','Ksenia Sobolevskaya')
+insert into dbo.shahmatist values	 (858,2,'male','Russia','2011-11-05','Dima Gorbach')
+insert into dbo.shahmatist values	 (1814,5,'female','Russia','2007-08-01','Alina Neborskaya')
+insert into dbo.shahmatist values	 (1010,2,'female','Russia','1980-11-05','Dasha Domkratova')
+insert into dbo.shahmatist values	 (1156,2,'male','Russia','1982-07-02','Roma Kozodoy')
+insert into dbo.shahmatist values	 (496,1,'female','Ukraine','1985-11-13','Arina Fomina')
+insert into dbo.shahmatist values	 (1797,4,'male','Ukraine','1987-01-13','Vlad Zakharov')
+insert into dbo.shahmatist values	 (2035,7,'female','Russia','1987-04-17','Vlada Gladova')
+insert into dbo.shahmatist values	 (397,1,'male','Russia','1992-04-24','Denis Zhenis')
+insert into dbo.shahmatist values	 (1508,3,'male','Russia','1995-01-11','Samir Gasanov')
+insert into dbo.shahmatist values	 (1939,5,'female','Russia','1995-06-20','Masha Oknova')
+insert into dbo.shahmatist values	 (402,1,'male','Russia','1996-01-26','Igor Vasilevkiy')
+insert into dbo.shahmatist values	 (2320,9,'female','Russia','1997-11-27','Karyna Ilyina')
+insert into dbo.shahmatist values	 (2244,9,'female','Russia','1998-12-31','Liza Maksimchik')
+insert into dbo.shahmatist values	 (1944,5,'male','Russia','1999-07-27','Aleksey Ustinenko')
+insert into dbo.shahmatist values	 (1703,4,'female','Russia','1999-08-24','Alla Allova')
+insert into dbo.shahmatist values	 (1433,3,'female','Russia','2000-04-26','Olya Kraiko')
+insert into dbo.shahmatist values	 (1868,5,'male','Russia','2001-07-05','Vadim Viltovkiy')
+insert into dbo.shahmatist values	 (483,1,'female','Russia','2002-03-06','Janna Kirichenko')
+insert into dbo.shahmatist values	 (350,1,'female','Russia','2002-08-16','Gakina Galkina')
+insert into dbo.shahmatist values	 (137,1,'female','Russia','2003-11-13','Nastya kushner')
+insert into dbo.shahmatist values	 (1416,3,'female','Russia','2005-10-25','Nastya Starchenko')
+insert into dbo.shahmatist values	 (995,1,'female','Russia','2007-07-25','Valearia Maklakova')
+insert into dbo.shahmatist values	 (192,1,'male','Belarus','2009-03-13','Ilya Gornov')
+insert into dbo.shahmatist values	 (1661,4,'male','Russia','2001-03-23','Petya Fomin')
+insert into dbo.shahmatist values	 (965,1,'female','Russia','2004-03-14','Annna Sitnik')
+insert into dbo.shahmatist values	 (1354,2,'male','Latvia','2001-11-14','Alyona Novik')
+insert into dbo.shahmatist values	 (1868,5,'male','Russia','1999-09-18','Grisha Grigoryev')
+insert into dbo.shahmatist values	 (2401,11,'female','Estonia','2005-06-10','Dianna Smorchkova')
+insert into dbo.shahmatist values	 (698,1,'male','Russia','2002-08-21','Ioann Semechkim')
+insert into dbo.shahmatist values	 (1304,2,'male','Russia','2003-07-18','Clim Zhukov')
+insert into dbo.shahmatist values	 (1184,2,'female','Poland','2003-11-12','Sasha Sushkina')
+insert into dbo.shahmatist values	 (2034,7,'female','Russia','2000-03-10','Ulyana Nosikova')
+insert into dbo.shahmatist values	 (153,1,'male','Russia','2006-01-13','Sasha Beznosikov')
+insert into dbo.shahmatist values	 (1667,4,'female','Russia','2002-03-25','Sasha Bazarova')
+--location
+insert into dbo.location values	 (	2	 ,'Nesterova 16')
+insert into dbo.location values	 (	2	 ,'Volgogradskaya 17')
+insert into dbo.location values	 (	2	 ,'Shmelina 40')
+insert into dbo.location values	 (	2	 ,'Rubacheva 54')
+insert into dbo.location values	 (	6	 ,'Kanovalova 56')
+insert into dbo.location values	 (	7	 ,'Shlotino 88')
+insert into dbo.location values	 (	2	 ,'Kirova 17')
+insert into dbo.location values	 (	2	 ,'Motino 67')
+insert into dbo.location values	 (	2	 ,'Ragozova 5')
+insert into dbo.location values	 (	2	 ,'Baykalskaya 9')
+insert into dbo.location values	 (	2	 ,'Ilimskaya 13')
+insert into dbo.location values	 (	8	 ,'Rotovo 1')
+insert into dbo.location values	 (	2	 ,'Shmelovo 99')
+insert into dbo.location values	 (	3	 ,'Sharikovo 199')
+insert into dbo.location values	 (	4	 ,'Mogilevskaya av.118')
+insert into dbo.location values	 (	1	 ,'Kurbacheva 6')
+insert into dbo.location values	 (	1	 ,'Kotovo 81')
+insert into dbo.location values	 (	5	 ,'Sobakino 299')
+insert into dbo.location values	 (	6	 ,'Utkono 98')
+insert into dbo.location values	 (	3	 ,'Karamzina 14')
+--club_info
+insert into dbo.club_info values	 ('Intelligence',15)
+insert into dbo.club_info values	 ('Etude',11)
+insert into dbo.club_info values	 ('October',4)
+insert into dbo.club_info values	 ('“Bitsa”',17)
+insert into dbo.club_info values	 ('SSHOR No. 25',3)
+insert into dbo.club_info values	 ('Youth of Moscow',13)
+insert into dbo.club_info values	 ('Chess house of RSSU',8)
+insert into dbo.club_info values	 ('Chess Club of the Council of Veterans of Moscow',12)
+insert into dbo.club_info values	 ('Strategy',2)
+insert into dbo.club_info values	 ('Shchemilovsky',19)
+insert into dbo.club_info values	 ('Rook',1)
+insert into dbo.club_info values	 ('On May Day',4)
+insert into dbo.club_info values	 ('Chess Club of the Law Faculty of Moscow S.U',6)
+insert into dbo.club_info values	 ('White Horse',7)
+insert into dbo.club_info values	 ('Horse and Elephant',9)
+insert into dbo.club_info values	 ('Chess School 1',16)	
+--club
+insert into dbo.club values	 (	23	 ,	11	 )
+insert into dbo.club values	 (	5	 ,	10	 )
+insert into dbo.club values	 (	36	 ,	16	 )
+insert into dbo.club values	 (	17	 ,	14	 )
+insert into dbo.club values	 (	8	 ,	12	 )
+insert into dbo.club values	 (	10	 ,	16	 )
+insert into dbo.club values	 (	18	 ,	11	 )
+insert into dbo.club values	 (	41	 ,	12	 )
+insert into dbo.club values	 (	1	 ,	1	 )
+insert into dbo.club values	 (	34	 ,	2	 )
+insert into dbo.club values	 (	26	 ,	3	 )
+insert into dbo.club values	 (	14	 ,	15	 )
+insert into dbo.club values	 (	15	 ,	10	 )
+insert into dbo.club values	 (	57	 ,	9	 )
+insert into dbo.club values	 (	40	 ,	8	 )
+insert into dbo.club values	 (	30	 ,	3	 )
+insert into dbo.club values	 (	11	 ,	3	 )
+insert into dbo.club values	 (	50	 ,	6	 )	
+--tournament
+insert into dbo.tournament values	 ('Team Championship of Russia 2018',	7	 ,'2018-09-18','2018-09-25',	1	 ,	100000	 )
+insert into dbo.tournament values	 ('World Chess Olympiad',	8	 ,'2019-02-22','2019-02-24',	2	 ,	1500000	 )
+insert into dbo.tournament values	 ('Tata Steel Chess 2018',	7	 ,'2018-06-21','2018-06-25',	16	 ,	20000	 )
+insert into dbo.tournament values	 ('World Team Championship',	9	 ,'2019-06-12','2019-06-19',	8	 ,	1000000	 )
+insert into dbo.tournament values	 ('XIV Extraordinary Congress of the Russia',	7	 ,'2019-04-29','2019-05-05',	13	 ,	0	 )
+insert into dbo.tournament values	 ('Generation Nutcracker Match Tournament',	7	 ,'2017-09-18','2017-09-26',	4	 ,	10000	 )
+insert into dbo.tournament values	 ('Moscow Grand Tournament',	7	 ,'2019-09-09','2019-09-23',	9	 ,	1600000	 )
+insert into dbo.tournament values	 ('Personal and team ch-you of Russia in rapid',	4	 ,'2019-05-13','2019-05-18',	15	 ,	0	 )
+insert into dbo.tournament values	 ('Russian Cup Final',	7	 ,'2019-03-25','2019-03-28',	7	 ,	400000	 )
+insert into dbo.tournament values	 ('Final of the Russian Children Cup 2018',	11	 ,'2019-04-01','2019-04-04',	4	 ,	0	 )
+insert into dbo.tournament values	 ('Candidates Tournament',	6	 ,'2019-08-05','2019-08-20',	4	 ,	800000	 )
+insert into dbo.tournament values	 ('Personal and team ch-you of Russia',	7	 ,'2018-05-03','2018-05-03',	12	 ,	5000	 )
+insert into dbo.tournament values	 ('Superfinal of the championship of Russia',	9	 ,'2018-10-10','2018-10-14',	15	 ,	200000	 )
+insert into dbo.tournament values	 ('RAPID Grand Prix 2019',	8	 ,'2019-04-05','2019-04-09',	11	 ,	40000	 )
+insert into dbo.tournament values	 ('Rapid and Blitz World Championships',	7	 ,'2019-03-28','2019-03-30',	9	 ,	67000	 )
+insert into dbo.tournament values	 ('European Team Championship',	8	 ,'2017-07-25','2017-07-30',	9	 ,	30000	 )
+insert into dbo.tournament values	 ('Tal Memorial',	7	 ,'2018-08-23','2018-08-27',	9	 ,	0	 )
+insert into dbo.tournament values	 ('Children Championship of Russia',	1	 ,'2019-07-02','2019-07-12',	12	 ,	0	 )
+insert into dbo.tournament values	 ('White Rook 2019',	7	 ,'	2019-04-02	 ','2019-04-06',	13	 ,	0	 )
+insert into dbo.tournament values	 ('Russian Championship 2019 among veterans',	9	 ,'2019-05-13','2019-05-15',	4	 ,	50000	 )
+insert into dbo.tournament values	 ('FIDE Women Grand Prix Stage in Skolkovo',	7	 ,'2019-05-15','2019-05-22',	5	 ,	60000	 )
+insert into dbo.tournament values	 ('Climb 2019',	1	 ,'2019-06-25','2019-07-05',	3	 ,	0	 )
+insert into dbo.tournament values	 ('Tal Grand',	7	 ,'2018-08-18','2018-08-22',	1	 ,	30000	 )
+insert into dbo.tournament values	 ('Chess General Education',	7	 ,'2017-10-27','2017-10-30',	1	 ,	0	 )
+insert into dbo.tournament values	 ('Aeroflot Open 2019',	7	 ,'2019-06-22','2019-06-29',	16	 ,	50000	 )
+insert into dbo.tournament values	 ('Russian Cup 2019',	7	 ,'2019-04-13','2019-04-15',	16	 ,	100000	 )
+insert into dbo.tournament values	 ('Final Rapid Grand Prix',	1	 ,'2019-03-04','2019-03-09',	2	 ,	130000	 )
+insert into dbo.tournament values	 ('Championship of Russia among rural schoolchildren',	1	 ,'2018-05-13','2018-05-16',	3	 ,	2000	 )
+insert into dbo.tournament values	 ('Russian Team Championship among boys and girls',	1	 ,'2018-04-23','2018-04-28',	11	 ,	5000	 )
+insert into dbo.tournament values	 ('Superfinal of the championship of Russia',	7	 ,'	2019-08-09	 ','2019-08-15',	10	 ,	1000000	 )
+insert into dbo.tournament values	 ('Chess General Education 2019',	7	 ,'	2019-04-10','2019-04-12',	10	 ,	13000	 )
+insert into dbo.tournament values	 ('Carlsen - Caruana World Championship Match',	7	 ,'2019-02-25','2019-02-27',	9	 ,	500000	 )
+insert into dbo.tournament values	 ('Major League Championship',	7	 ,'2018-10-23','2018-10-25',	5	 ,	300000	 )
+insert into dbo.tournament values	 ('Russian Cup for children 2019',	7	 ,'2019-04-16','2019-04-26',	12	 ,	0	 )
+insert into dbo.tournament values	 ('Match-tournament "Nutcracker"',	7	 ,'2018-06-11','2018-06-16',	6	 ,	15000	 )
+insert into dbo.tournament values	 ('Tournaments in the Central House of Chess Players',	7	 ,'2019-04-22','2019-04-25',	4	 ,	0	 )
+insert into dbo.tournament values	 ('FIDE Grand Prix Stage',	11	 ,'2019-07-26','2019-08-04',	8	 ,	160000	 )
+insert into dbo.tournament values	 ('Russian Team Championship 2019',	7	 ,'2019-07-28','2019-08-12',	8	 ,	78000	 )
+insert into dbo.tournament values	 ('Challenger Tournament',	1	 ,'2018-09-13','2018-09-19',	15	 ,	1000000	 )
+insert into dbo.tournament values	 ('Personal and team ch-you of Russia in rapid',	3	 ,'2017-03-23','2017-03-27',	12	 ,	5000	 )
+insert into dbo.tournament values	 ('Climb 2018',	1	 ,'2018-04-10','2018-04-14',	15	 ,	0	 )
+insert into dbo.tournament values	 ('Riga holidays 2019',	5	 ,'2019-04-23','2019-04-29',	13	 ,	12000	 )
+insert into dbo.tournament values    ('Moscow Legends 2020', 7, '2020-02-15','2020-02-20', 7, 10000)
+--participation
+insert into dbo.participation values	 (	51	 ,	43	 ,	1	 ,	90	 )
+insert into dbo.participation values	 (	55	 ,	43	 ,	2	 ,	42	 )
+insert into dbo.participation values	 (	19	 ,	37	 ,	1	 ,	30	 )
+insert into dbo.participation values	 (	2	 ,	37	 ,	2	 ,	60	 )
+insert into dbo.participation values	 (	55	 ,	24	 ,	2	 ,	50	 )
+insert into dbo.participation values	 (	2	 ,	24	 ,	1	 ,	100	 )
+insert into dbo.participation values	 (	51	 ,	26	 ,	2	 ,	40	 )
+insert into dbo.participation values	 (	55	 ,	26   ,	1	 ,	10	 )
+insert into dbo.participation values	 (	19	 ,	21	 ,	1	 ,	39	 )
+insert into dbo.participation values	 (	2	 ,	21	 ,	2	 ,	18	 )
+insert into dbo.participation values	 (	19	 ,	20	 ,	1	 ,	40	 )
+insert into dbo.participation values	 (	51	 ,	20	 ,	2	 ,	10	 )
+insert into dbo.participation values	 (	2	 ,	12	 ,	2	 ,	20	 )
+insert into dbo.participation values	 (	55	 ,	12	 ,	3	 ,  -2	 )
+insert into dbo.participation values	 (	19	 ,	12	 ,	1	 ,	40	 )
+insert into dbo.participation values	 (	7	 ,	8	 ,	3	 ,	-15	 )
+insert into dbo.participation values	 (	4	 ,	8	 ,	2	 ,	10	 )
+insert into dbo.participation values	 (	18	 ,	8	 ,	1	 ,	38	 )
+insert into dbo.participation values	 (	51	 ,	7	 ,	2	 ,	15	 )
+insert into dbo.participation values	 (	55	 ,	7	 ,	3	 ,	-6	 )
+insert into dbo.participation values	 (	2	 ,	7	 ,	1	 ,	32	 )
+insert into dbo.participation values	 (	51	 ,	1	 ,	1	 ,	40	 )
+insert into dbo.participation values	 (	55	 ,	1	 ,	2	 ,	15	 )
+insert into dbo.participation values	 (	2	 ,	1	 ,	3	 ,	-4	 )
+insert into dbo.participation values	 (	2	 ,	15	 ,	2	 ,	-33	 )
+insert into dbo.participation values	 (	55	 ,	33	 ,	5	 ,	19	 )
+insert into dbo.participation values	 (	53	 ,	3	 ,	1	 ,	20	 )
+insert into dbo.participation values	 (	49	 ,	11	 ,	1	 ,	-11	 )
+insert into dbo.participation values	 (	29	 ,	41	 ,	4	 ,	11	 )
+insert into dbo.participation values	 (	37	 ,	16	 ,	2	 ,	14	 )
+insert into dbo.participation values	 (	43	 ,	40	 ,	2	 ,	-8	 )
+insert into dbo.participation values	 (	44	 ,	27	 ,	1	 ,	4	 )
+insert into dbo.participation values	 (	47	 ,	16	 ,	2	 ,	-25	 )
+insert into dbo.participation values	 (	44	 ,	13	 ,	4	 ,	-25	 )
+insert into dbo.participation values	 (	24	 ,	39	 ,	1	 ,	11	 )
+insert into dbo.participation values	 (	17	 ,	42	 ,	2	 ,	18	 )
+insert into dbo.participation values	 (	41	 ,	27	 ,	2	 ,	30	 )
+insert into dbo.participation values	 (	47	 ,	18	 ,	1	 ,	-18	 )
+insert into dbo.participation values	 (	36	 ,	29	 ,	3	 ,	29	 )
+insert into dbo.participation values	 (	23	 ,	17	 ,	2	 ,	-3	 )
+insert into dbo.participation values	 (	27	 ,	31	 ,	3	 ,	-37	 )
+insert into dbo.participation values	 (	42	 ,	11	 ,	4	 ,	-23	 )
+insert into dbo.participation values	 (	24	 ,	32	 ,	2	 ,	46	 )
+insert into dbo.participation values	 (	23	 ,	33	 ,	4	 ,	33	 )
+insert into dbo.participation values	 (	26	 ,	39	 ,	2	 ,	-5	 )
+insert into dbo.participation values	 (	14	 ,	28	 ,	2	 ,	47	 )
+insert into dbo.participation values	 (	55	 ,	5	 ,	5	 ,	7	 )
+insert into dbo.participation values	 (	13	 ,	36	 ,	4	 ,	-7	 )
+insert into dbo.participation values	 (	49	 ,	16	 ,	1	 ,	-17	 )
+insert into dbo.participation values	 (	40	 ,	13	 ,	3	 ,	-4	 )
+insert into dbo.participation values	 (	30	 ,	29	 ,	2	 ,	-38	 )
+insert into dbo.participation values	 (	10	 ,	33	 ,	1	 ,	7	 )
+insert into dbo.participation values	 (	31	 ,	6	 ,	5	 ,	-6	 )
+insert into dbo.participation values	 (	23	 ,	25	 ,	4	 ,	10	 )
+insert into dbo.participation values	 (	40	 ,	5	 ,	4	 ,	43	 )
+insert into dbo.participation values	 (	41	 ,	19	 ,	3	 ,	-10	 )
+insert into dbo.participation values	 (	22	 ,	32	 ,	5	 ,	-9	 )
+insert into dbo.participation values	 (	43	 ,	27	 ,	5	 ,	-26	 )
+insert into dbo.participation values	 (	26	 ,	32	 ,	1	 ,	5	 )
+insert into dbo.participation values	 (	47	 ,	31	 ,	4	 ,	29	 )
+insert into dbo.participation values	 (	17	 ,	30	 ,	3	 ,	6	 )
+insert into dbo.participation values	 (	10	 ,	30	 ,	3	 ,	6	 )
+insert into dbo.participation values	 (	47	 ,	4	 ,	2	 ,	-7	 )
+insert into dbo.participation values	 (	39	 ,	42	 ,	5	 ,	-8	 )
+insert into dbo.participation values	 (	11	 ,	2	 ,	3	 ,	-17	 )
+insert into dbo.participation values	 (	5	 ,	36	 ,	1	 ,	-10	 )
+insert into dbo.participation values	 (	46	 ,	38	 ,	3	 ,	-36	 )
+insert into dbo.participation values	 (	46	 ,	34	 ,	2	 ,	-27	 )
+insert into dbo.participation values	 (	46	 ,	16	 ,	1	 ,	-21	 )
+insert into dbo.participation values	 (	17	 ,	9	 ,	4	 ,	-40	 )
+insert into dbo.participation values	 (	40	 ,	40	 ,	3	 ,	10	 )
+insert into dbo.participation values	 (	55	 ,	41	 ,	3	 ,	-20	 )
+insert into dbo.participation values	 (	11	 ,	35	 ,	2	 ,	0	 )
+insert into dbo.participation values	 (	34	 ,	25	 ,	3	 ,	-37	 )
+insert into dbo.participation values	 (	55	 ,	17	 ,	4	 ,	-16	 )
+insert into dbo.participation values	 (	32	 ,	3	 ,	3	 ,	39	 )
+insert into dbo.participation values	 (	9	 ,	13	 ,	5	 ,	35	 )
+insert into dbo.participation values	 (	32	 ,	36	 ,	5	 ,	43	 )
+insert into dbo.participation values	 (	53	 ,	14	 ,	1	 ,	47	 )
+insert into dbo.participation values	 (	15	 ,	11	 ,	3	 ,	31	 )
+insert into dbo.participation values	 (	43	 ,	27	 ,	1	 ,	40	 )
+insert into dbo.participation values	 (	49	 ,	36	 ,	3	 ,	0	 )
+insert into dbo.participation values	 (	28	 ,	33	 ,	5	 ,	-38	 )
+insert into dbo.participation values	 (	5	 ,	22	 ,	3	 ,	-27	 )
+insert into dbo.participation values	 (	55	 ,	9	 ,	1	 ,	11	 )
+insert into dbo.participation values	 (	30	 ,	27	 ,	1	 ,	-6	 )
+insert into dbo.participation values	 (	22	 ,	19	 ,	4	 ,	50	 )
+insert into dbo.participation values	 (	39	 ,	10	 ,	3	 ,	-17	 )
+insert into dbo.participation values	 (	28	 ,	5	 ,	1	 ,	-30	 )
+insert into dbo.participation values	 (	41	 ,	30	 ,	4	 ,	3	 )
+insert into dbo.participation values	 (	49	 ,	3	 ,	5	 ,	5	 )
+insert into dbo.participation values	 (	31	 ,	30	 ,	1	 ,	-17	 )
+insert into dbo.participation values	 (	16	 ,	22	 ,	3	 ,	0	 )
+insert into dbo.participation values	 (	12	 ,	13	 ,	1	 ,	-11	 )
+insert into dbo.participation values	 (	9	 ,	23	 ,	5	 ,	17	 )
+insert into dbo.participation values	 (	10	 ,	38	 ,	4	 ,	-12	 )
+insert into dbo.participation values	 (	33	 ,	3	 ,	3	 ,	25	 )
+insert into dbo.participation values	 (	36	 ,	19	 ,	4	 ,	33	 )
+insert into dbo.participation values	 (	9	 ,	41	 ,	3	 ,	41	 )
+insert into dbo.participation values	 (	26	 ,	36	 ,	3	 ,	34	 )
+insert into dbo.participation values	 (	16	 ,	6	 ,	2	 ,	-8	 )
+insert into dbo.participation values	 (	12	 ,	2	 ,	3	 ,	3	 )
+insert into dbo.participation values	 (	14	 ,	25	 ,	1	 ,	32	 )
+insert into dbo.participation values	 (	37	 ,	33	 ,	1	 ,	32	 )
+insert into dbo.participation values	 (	17	 ,	32	 ,	2	 ,	17	 )
+insert into dbo.participation values	 (	13	 ,	3	 ,	1	 ,	-36	 )
+insert into dbo.participation values	 (	33	 ,	27	 ,	4	 ,	2	 )
+insert into dbo.participation values	 (	16	 ,	13	 ,	1	 ,	-23	 )
+insert into dbo.participation values	 (	38	 ,	3	 ,	2	 ,	-11	 )
+insert into dbo.participation values	 (	38	 ,	5	 ,	1	 ,	-25	 )
+insert into dbo.participation values	 (	50	 ,	25	 ,	5	 ,	40	 )
+insert into dbo.participation values	 (	55	 ,	2	 ,	1	 ,	1	 )
+insert into dbo.participation values	 (	28	 ,	34	 ,	2	 ,	48	 )
+insert into dbo.participation values	 (	50	 ,	42	 ,	2	 ,	24	 )
+insert into dbo.participation values	 (	29	 ,	10	 ,	2	 ,	20	 )
+insert into dbo.participation values	 (	24	 ,	16	 ,	4	 ,	6	 )
+--matches
+insert into dbo.matches values	 (	1	 ,	5	 ,	0.6	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	2	 ,	6	 ,	0.4	 ,'Blitz','0:10',	NULL	 )
+insert into dbo.matches values	 (	3	 ,	7	 ,	0.1	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	4	 ,	8	 ,	0.4	 ,'Classic','1:15',	NULL	 )
+insert into dbo.matches values	 (	5	 ,	9	 ,	0.3	 ,'Rapid','0:45',	NULL	 )
+insert into dbo.matches values	 (	6	 ,	10	 ,	0.4	 ,'Classic','1:00',	NULL	 )
+insert into dbo.matches values	 (	7	 ,	11	 ,	0.3	 ,'Blitz','0:11',	NULL	 )
+insert into dbo.matches values	 (	8	 ,	12	 ,	0.4	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	9	 ,	13	 ,	0.1	 ,'Blitz','0:08',	NULL	 )
+insert into dbo.matches values	 (	10	 ,	14	 ,	0.6	 ,'Classic','1:25',	NULL	 )
+insert into dbo.matches values	 (	11	 ,	15	 ,	0.2	 ,'Rapid','0:45',	NULL	 )
+insert into dbo.matches values	 (	12	 ,	16	 ,	0.5	 ,'Classic','2:11',	NULL	 )
+insert into dbo.matches values	 (	13	 ,	17	 ,	0.5	 ,'Classic','1:55',	NULL	 )
+insert into dbo.matches values	 (	14	 ,	18	 ,	0.9	 ,'Blitz','	0:10',	NULL	 )
+insert into dbo.matches values	 (	15	 ,	19	 ,	0.8	 ,'Rapid','	0:44',	NULL	 )
+insert into dbo.matches values	 (	16	 ,	20	 ,	0.2	 ,'Rapid','	0:44',	NULL	 )
+insert into dbo.matches values	 (	17	 ,	21	 ,	0.5	 ,'Rapid','	0:49',	NULL	 )
+insert into dbo.matches values	 (	18	 ,	22	 ,	0.5	 ,'Blitz','	0:11',	NULL	 )
+insert into dbo.matches values	 (	19	 ,	23	 ,	0.9	 ,'Blitz','	0:09',	NULL	 )
+insert into dbo.matches values	 (	20	 ,	24	 ,	0.8	 ,'Classic','1:55',	NULL	 )
+insert into dbo.matches values	 (	21	 ,	25	 ,	0.7	 ,'Classic','2:13',	NULL	 )
+insert into dbo.matches values	 (	22	 ,	26	 ,	0.7	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	23	 ,	27	 ,	0.7	 ,'Classic','1:56',	NULL	 )
+insert into dbo.matches values	 (	24	 ,	28	 ,	0.5	 ,'Blitz','0:08',	NULL	 )
+insert into dbo.matches values	 (	25	 ,	29	 ,	0.6	 ,'Rapid','0:55',	NULL	 )
+insert into dbo.matches values	 (	26	 ,	30	 ,	0.8	 ,'Rapid','0:55',	NULL	 )
+insert into dbo.matches values	 (	27	 ,	31	 ,	0.2	 ,'Classic','1:17',	NULL	 )
+insert into dbo.matches values	 (	28	 ,	32	 ,	0.8	 ,'Rapid','0:39',	NULL	 )
+insert into dbo.matches values	 (	29	 ,	33	 ,	0.8	 ,'Blitz','0:10',	NULL	 )
+insert into dbo.matches values	 (	30	 ,	34	 ,	0.4	 ,'Classic','1:00',	NULL	 )
+insert into dbo.matches values	 (	31	 ,	35	 ,	0.7	 ,'Classic','2:33',	NULL	 )
+insert into dbo.matches values	 (	32	 ,	36	 ,	0.1	 ,'Rapid','0:44',	NULL	 )
+insert into dbo.matches values	 (	33	 ,	37	 ,	0.7	 ,'Blitz','0:10',	NULL	 )
+insert into dbo.matches values	 (	34	 ,	38	 ,	0.2	 ,'Classic','1:02',	NULL	 )
+insert into dbo.matches values	 (	35	 ,	39	 ,	0.4	 ,'Rapid','0:59',	NULL	 )
+insert into dbo.matches values	 (	36	 ,	40	 ,	0.2	 ,'Rapid','0:27',	NULL	 )
+insert into dbo.matches values	 (	37	 ,	41	 ,	0.8	 ,'Classic','1:46',	NULL	 )
+insert into dbo.matches values	 (	38	 ,	42	 ,	0.1	 ,'Rapid','0:33',	NULL	 )
+insert into dbo.matches values	 (	39	 ,	43	 ,	0.9	 ,'Rapid','0:30',	NULL	 )
+insert into dbo.matches values	 (	40	 ,	44	 ,	0.4	 ,'Rapid','0:30',	NULL	 )
+insert into dbo.matches values	 (	41	 ,	45	 ,	0.5	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	42	 ,	46	 ,	0.5	 ,'Rapid','0:44',	NULL	 )
+insert into dbo.matches values	 (	43	 ,	47	 ,	0.5	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	44	 ,	48	 ,	0.6	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	45	 ,	49	 ,	0.1	 ,'Rapid','0:59',	NULL	 )
+insert into dbo.matches values	 (	46	 ,	50	 ,	0.7	 ,'Blitz','0:55',	NULL	 )
+insert into dbo.matches values	 (	47	 ,	51	 ,	0.2	 ,'Rapid','0:08',	NULL	 )
+insert into dbo.matches values	 (	48	 ,	52	 ,	0.6	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values	 (	49	 ,	53	 ,	0.3	 ,'Blitz','0:09',	NULL	 )
+insert into dbo.matches values   (  50   ,  54   ,  0.2  ,'Blitz','0:08',   NULL     )
+	
+--matches_moves
+insert into dbo.matches_moves values	 (	33	 ,	27	 )
+insert into dbo.matches_moves values	 (	8	 ,	27	 )
+insert into dbo.matches_moves values	 (	31	 ,	41	 )
+insert into dbo.matches_moves values	 (	34	 ,	31	 )
+insert into dbo.matches_moves values	 (	29	 ,	17	 )
+insert into dbo.matches_moves values	 (	33	 ,	29	 )
+insert into dbo.matches_moves values	 (	39	 ,	2	 )
+insert into dbo.matches_moves values	 (	45	 ,	19	 )
+insert into dbo.matches_moves values	 (	28	 ,	6	 )
+insert into dbo.matches_moves values	 (	41	 ,	39	 )
+insert into dbo.matches_moves values	 (	43	 ,	18	 )
+insert into dbo.matches_moves values	 (	41	 ,	21	 )
+insert into dbo.matches_moves values	 (	13	 ,	40	 )
+insert into dbo.matches_moves values	 (	18	 ,	13	 )
+insert into dbo.matches_moves values	 (	8	 ,	26	 )
+insert into dbo.matches_moves values	 (	9	 ,	12	 )
+insert into dbo.matches_moves values	 (	25	 ,	40	 )
+insert into dbo.matches_moves values	 (	36	 ,	25	 )
+insert into dbo.matches_moves values	 (	39	 ,	40	 )
+insert into dbo.matches_moves values	 (	37	 ,	6	 )
+insert into dbo.matches_moves values	 (	23	 ,	22	 )
+insert into dbo.matches_moves values	 (	20	 ,	1	 )
+insert into dbo.matches_moves values	 (	20	 ,	28	 )
+insert into dbo.matches_moves values	 (	18	 ,	36	 )
+insert into dbo.matches_moves values	 (	24	 ,	25	 )
+insert into dbo.matches_moves values	 (	6	 ,	4	 )
+insert into dbo.matches_moves values	 (	18	 ,	15	 )
+insert into dbo.matches_moves values	 (	11	 ,	14	 )
+insert into dbo.matches_moves values	 (	49	 ,	1	 )
+insert into dbo.matches_moves values	 (	7	 ,	11	 )
+insert into dbo.matches_moves values	 (	11	 ,	27	 )
+insert into dbo.matches_moves values	 (	43	 ,	28	 )
+insert into dbo.matches_moves values	 (	39	 ,	39	 )
+insert into dbo.matches_moves values	 (	17	 ,	26	 )
+insert into dbo.matches_moves values	 (	14	 ,	16	 )
+insert into dbo.matches_moves values	 (	49	 ,	11	 )
+insert into dbo.matches_moves values	 (	32	 ,	30	 )
+insert into dbo.matches_moves values	 (	3	 ,	2	 )
+insert into dbo.matches_moves values	 (	17	 ,	22	 )
+insert into dbo.matches_moves values	 (	32	 ,	8	 )
+insert into dbo.matches_moves values	 (	12	 ,	30	 )
+insert into dbo.matches_moves values	 (	27	 ,	25	 )
+insert into dbo.matches_moves values	 (	38	 ,	2	 )
+insert into dbo.matches_moves values	 (	34	 ,	7	 )
+insert into dbo.matches_moves values	 (	13	 ,	10	 )
+insert into dbo.matches_moves values	 (	41	 ,	37	 )
+insert into dbo.matches_moves values	 (	22	 ,	7	 )
+insert into dbo.matches_moves values	 (	28	 ,	9	 )
+insert into dbo.matches_moves values	 (	8	 ,	22	 )
+insert into dbo.matches_moves values	 (	25	 ,	42	 )		
+--access
+insert into dbo.access values	 (	1	 ,'manadamnakche@pa','677cbe8610715c97af66c61b925522a4')
+insert into dbo.access values	 (	2	 ,'ahmed.m@donoboz.ru','413523eaf314faa46082a644471f526b')
+insert into dbo.access values	 (	3	 ,'rambo01978r@hercm','fe40d2e905467338578902a18261d4f6')
+insert into dbo.access values	 (	4	 ,'heloisa.eduar@credup.ru','d8a330a6e03de301da92f31f3358b0b2')
+insert into dbo.access values	 (	5	 ,'jake.badal.9b@gedore-rus.ru','859281d312fb9000a89ed394a0e244d6')
+insert into dbo.access values	 (	6	 ,'orreoparacarlos.ga','c57238b73daf954eaaeafc104b13a958')
+insert into dbo.access values	 (	7	 ,'afemarket.site','c3142a610f506a13dec44ddbb44066bd')
+insert into dbo.access values	 (	8	 ,'derbydales.co.uk','4d3567c75faab181c318524a30ca4ed6')
+insert into dbo.access values	 (	9	 ,'esbano-online.ru','b4675d38d30acb0e7fabeb855bd63040')
+insert into dbo.access values	 (	10	 ,'hbs-group.ru','79be4e9b70df9da96ebbed69be086cdb')
+insert into dbo.access values	 (	11	 ,'mdtk.us','8774db3222708ca904b2cf3e31347e9e')
+insert into dbo.access values	 (	12	 ,'ise4mqle13.o-r.kr','9bd1536281edc993aacea58afcd7fc67')
+insert into dbo.access values	 (	13	 ,'frainklygaming.me','96534d8f559acc8a536299e261b8fe2e')
+insert into dbo.access values	 (	14	 ,'goldensochi-remont.ru','1f0275def2030cda1437cdcd3c45d146')
+insert into dbo.access values	 (	15	 ,'surveyrecruiters.com','d6e63b06988cb2957b55cc5b197d2269')
+insert into dbo.access values	 (	16	 ,'colorworld.info','caf2dba1df5c19ea3c3c4e942db8d522')
+insert into dbo.access values	 (	17	 ,'luxusroleplay.us','5a1e3112a74dd8dec3020b6d6af1d826')
+insert into dbo.access values	 (	18	 ,'internet-v-volgograde.ru','4115b031502a43cb11641a70ae7dd432')
+insert into dbo.access values	 (	19	 ,'chantellegribbon.com','34a25a2a77b93a3a680b394af9cb68ab')
+insert into dbo.access values	 (	20	 ,'ecotrafik-spb.ru','bf9cebb5d98cf6bf477a2943ab63ab40')
+insert into dbo.access values	 (	21	 ,'tudena.pro','c81e728d9d4c2f636f067f89cc14862c')
+insert into dbo.access values	 (	22	 ,'couponyes.ru','3c59dc048e8850243be8079a5c74d079')
+insert into dbo.access values	 (	23	 ,'mamamintaemail.com','1534b76d325a8f591b52d302e7181331')
+insert into dbo.access values	 (	24	 ,'friendlypuppy.info','abdbeb4d8dbe30df8430a8394b7218ef')
+insert into dbo.access values	 (	25	 ,'freshportal.ru','c876da2dc35e298b13f5ce07b724065a')
+insert into dbo.access values	 (	26	 ,'cheerleading-perm.ru','8289b517eec6d7a7f6a6e9c2a5191e2f')
+insert into dbo.access values	 (	27	 ,'themindfullearningpath.com','07d9e4d98389938606b41642dd6fc8cb')
+insert into dbo.access values	 (	28	 ,'mamamintae1mail.com','b7d430c2edb1b885bc373681217469a1')
+insert into dbo.access values	 (	29	 ,'i.e-tpc.online','43acea8fc33aec400c3c7032f0c7aa92')
+insert into dbo.access values	 (	30	 ,'sturgeonpointchurch.com','7c2711c46641341d061faaa584c21709')
+insert into dbo.access values	 (	31	 ,'centercoupon.ru','8fa14cdd754f91cc6554c9e71929cce7')
+insert into dbo.access values	 (	32	 ,'rusofob@232.ru','bd19836ddb62c11c55ab251ccaca5645')
+insert into dbo.access values	 (	33	 ,'sturgeo2npointchurch.com','be83ab3ecd0db773eb2dc1b0a17836a1')
+insert into dbo.access values	 (	34	 ,'mp3sa.my.to','d5e2fbef30a4eb668a203060ec8e5eef')
+insert into dbo.access values	 (	35	 ,'izobretateli59.ru','70eaa4c4c54f602749276c75f50e2278')
+insert into dbo.access values	 (	36	 ,'colorwo1rld.info','1309d869f629419d9cea3dfc50d387b2')
+insert into dbo.access values	 (	37	 ,'b-expert.xyz','fe09a3b5f3e05f8ce9f307d97386264d')
+insert into dbo.access values	 (	38	 ,'friendlyp2uppy.info','bd44f47c7b191e4c17769853eb26bed1')
+insert into dbo.access values	 (	39	 ,'chistopole.ru','e03d2644a03b3f7afde78fe9d94cbc4c')
+insert into dbo.access values	 (	40	 ,'marieke-mulder.online','5bf4c26993762bc43c211bce0de4e9e8')
+insert into dbo.access values	 (	41	 ,'mamamintae8mail.com','00c2afc17b4ab4a95b2dc6e080627ca0')
+insert into dbo.access values	 (	42	 ,'mquote.tk','db2719d0a4507117846b52d29f9bfd54')
+insert into dbo.access values	 (	43	 ,'invalidmarket.ru','f054fe66c81ebbc0956e448de1ed62bf')
+insert into dbo.access values	 (	44	 ,'intimm-shop.ru','9b00cb4a38fc270427156e3b715fde12')
+insert into dbo.access values	 (	45	 ,'healthfitnesschannel.club','beb6eea08ff023407843d1bf5da0b83d')
+insert into dbo.access values	 (	46	 ,'invalidm4arket.ru','453f03710207e1c10468e8adc53cd06c')
+insert into dbo.access values	 (	47	 ,'wer.icu','75db91926538c8ce430f8f925a345735')
+insert into dbo.access values	 (	48	 ,'mquote.3tk','4398eab46bfb7d5aa6e435c85ffbb8a4')
+insert into dbo.access values	 (	49	 ,'dr-nas4ir-alzahrani.org','82821eb107e18ba1987673e5b9d496bc')
+insert into dbo.access values	 (	50	 ,'b-exper4t.xyz','73ac36a30da630bf935c2fcecd010393')
+insert into dbo.access values	 (	51	 ,'esban5o-online.ru','cc0243a23842488efa7ffc18684ea270')
+insert into dbo.access values	 (	52	 ,'awer.icu','96b7d74fcca8b8c5ee5a88cee6cc8a92')
+insert into dbo.access values	 (	53	 ,'internet-v-shakhti.ru','8ccdcd4657bc2a840c0c009a16718da6')
+insert into dbo.access values	 (	54	 ,'gadgethitsshop.com','c9e5b1797296340063fdcfae603f5019')
+insert into dbo.access values	 (	55	 ,'ets2android.mobi','cb847c3c6bf1b8b778bc448a6360b3e')
+insert into dbo.access values	 (	56	 ,'busi1nessma4ke.com','782202c04a19ba0b556380bbfaf9965f')
+insert into dbo.access values	 (	57   ,'rateiovirtual.club','017bd55bc8c1c3c69ee87751da25374c')						
+
+

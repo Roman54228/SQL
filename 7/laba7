@@ -1,0 +1,141 @@
+drop login test
+go
+create login test 
+  with password = 'RomanFilonov123',
+  default_database =[laba3]
+go
+drop user test
+GO
+create user test for login test
+-------
+grant select on  object::dbo.shahmatist to test
+grant insert on  object::dbo.shahmatist to test
+grant update on  object::dbo.shahmatist to test
+----------
+grant select on object:: dbo.tournament (prize_pool,tourn_id) to test
+grant update on object:: dbo.tournament (prize_pool,tourn_id) to test
+grant select on object::dbo.qual (min_rating_man,qual_id,qual_name) to test
+grant update on object:: dbo.qual (min_rating_man,qual_name) to test
+-------------------------
+grant select on object::dbo.qual to test
+------------------------
+grant select on object::VIEW5 to test
+grant update on object::VIEW5 to test
+--------------------
+drop role role1;
+go
+create role role1
+GO
+grant update on object::dbo.shahmatist(rating) to role1 
+exec sp_addrolemember @rolename = 'role1', @membername = 'test'
+
+/*select*/
+EXECUTE AS USER = 'test'; 
+GO
+SELECT * FROM dbo.shahmatist;
+GO
+SELECT * FROM dbo.qual
+GO
+SELECT shahmatist_id, rating FROM dbo.shahmatist;
+GO 
+REVERT; 
+GO 
+
+EXECUTE AS USER = 'test'; 
+GO
+SELECT * FROM dbo.shahmatist;
+GO
+REVERT; 
+GO
+
+/*update */
+EXECUTE AS USER = 'test'; 
+GO
+UPDATE dbo.shahmatist SET rating= 2000 where shahmatist_id = 1
+GO
+UPDATE dbo.qual SET min_rating_man= 2500  where qual_id=2
+GO 
+REVERT; 
+GO
+------
+EXECUTE AS USER = 'test'; 
+GO
+UPDATE dbo.shahmatist SET [name]='Masha' where shahmatist_id=1
+GO
+UPDATE dbo.qual SET qual_name='international champion' 
+GO
+REVERT;
+GO
+-----------------------------
+EXECUTE AS USER = 'test'; 
+GO
+UPDATE dbo.tournament set prize_pool=12000
+GO
+REVERT; 
+GO
+----------------------------------------------------------
+/*SELECT view*/
+EXECUTE AS USER = 'test'; 
+GO
+SELECT * FROM dbo.VIEW5;
+GO
+REVERT; 
+GO 
+----------------------------
+EXECUTE AS USER = 'test'; 
+GO
+update VIEW5 set place=3 where qual_name='nat_master among women'
+GO
+REVERT; 
+GO 
+----------------------------
+---------------------------- 
+
+----------------------------------------------------------------------
+/*REVOKE*/
+EXECUTE AS USER = 'test'; 
+GO
+SELECT name,rating FROM dbo.shahmatist;
+GO 
+REVERT; 
+GO 
+REVOKE SELECT ON OBJECT::dbo.shahmatist FROM test;
+GO
+EXECUTE AS USER = 'test'; 
+GO
+SELECT name,rating FROM dbo.shahmatist;
+GO 
+REVERT; 
+GO 
+-----------------------------------------------------------------------
+
+SELECT CURRENT_USER as [CURRENT_USER];
+-----------------------------------------------------------------------
+
+DROP LOGIN reader
+GO
+CREATE LOGIN reader
+        WITH PASSWORD='RomanRoman213', 
+        DEFAULT_DATABASE=[laba3]
+GO
+DROP USER reader
+GO
+CREATE USER reader FOR LOGIN reader
+GO
+EXEC sp_addrolemember @rolename = db_datareader, @membername = 'reader'; 
+GO
+EXECUTE AS USER = 'reader'; 
+GO
+SELECT name,rating FROM dbo.shahmatist;
+GO 
+REVERT; 
+GO 
+
+
+--grant
+--deny
+--grant
+
+--grant
+--deny
+--revoke

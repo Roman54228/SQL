@@ -1,0 +1,14 @@
+/*Увеличить изменение рейтинга на 50 игрока победившего в самой короткой блиц игре */
+update participation
+set rating_change = rating_change + 50
+where participant_id IN
+(
+    select top(1) player_black from matches
+join matches_moves
+on(matches.match_id=matches_moves.match_id)
+join tournament
+on(matches_moves.tourn_id=tournament.tourn_id)
+where game_mode = 'Blitz'
+order by tim
+
+)

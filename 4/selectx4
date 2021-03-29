@@ -1,0 +1,39 @@
+/*Вывести шахматистов сыгравших в сумме меньше двух игр за всё время */
+select shahmatist.shahmatist_id,shahmatist.name from matches
+join participation
+on(matches.player_white=participation.participant_id)
+join shahmatist
+on(participation.shahmatist_id=shahmatist.shahmatist_id)
+
+group by shahmatist.shahmatist_id, shahmatist.name
+having count(match_id) < 2
+
+
+
+
+
+/*Вывести матчи проходившие на турнирах для игроков со званием национальный мастер и выше в 2019 году в период с января по май      */
+select matches.match_id from matches
+join matches_moves
+on(matches.match_id = matches_moves.match_id)
+join tournament
+on(matches_moves.tourn_id=tournament.tourn_id)
+where month(start_date) < 5 and year(start_date) = 2019
+and qual_id >= 7
+
+/*вывести названия клубов в которых есть игроки со званием ‘кандидат в мастера’ и выше  */
+select club_name from club_info
+join club
+on(club_info.club_id=club.club_id)
+join shahmatist
+on(club.shahmatist_id=shahmatist.shahmatist_id)
+where qual_id > 6
+
+/*вывести самый долгий матч Классика на турнире ‘Climb 2019’и его длительность  */
+select top(1) matches.match_id,[tim],game_mode from matches
+join matches_moves
+on(matches.match_id=matches_moves.match_id)
+join tournament
+on(matches_moves.tourn_id=tournament.tourn_id)
+where tourn_name = 'Climb 2019' and game_mode = 'Classic'
+order by tim

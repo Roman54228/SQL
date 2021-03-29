@@ -1,0 +1,7 @@
+select sales_order.customer_id , avg(total) as tot@l from dbo.SALES_ORDER
+join dbo.CUSTOMER
+on(dbo.SALES_ORDER.customer_id=dbo.CUSTOMER.customer_id)
+where state = 'CA'
+group by sales_order.customer_id
+
+
